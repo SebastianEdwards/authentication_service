@@ -1,45 +1,33 @@
 module ProviderStrategies
-  module Base
-    module CommonMethods
-      attr_accessor :env, :params
+  class Base
+    attr_reader :env, :params
 
-      def initialize(_env)
-        self.env = _env
-        self.params = _env['params']
-      end
-
-      def valid?
-        false
-      end
-
-      def build_query(hash)
-        Rack::Utils.build_query(hash)
-      end
-
-      def redirect_uri
-        query = {
-          redirect_uri: params[:redirect_uri],
-          client_id: params[:client_id]
-        }
-        redirect_query = build_query(query)
-        base_url + "/#{params[:provider]}/callback?" + redirect_query
-      end
+    def initialize(env)
+      @env = env
+      @params = env.params
     end
 
-    class Authorization
-      include CommonMethods
+    def valid?; true; end
 
-      def call
-        self.redirect_to if valid?
-      end
+    def build_query(hash)
+      Rack::Utils.build_query(hash)
     end
 
-    class Callback
-      include CommonMethods
-
-      def call
-        self.user if valid?
-      end
+    def redirect_uri
+      query = {
+        redirect_uri: params[:redirect_uri],
+        client_id: params[:client_id]
+      }
+      redirect_query = build_query(query)
+      base_url + "/#{params[:provider]}/callback?" + redirect_query
     end
-  end
-end
+
+    def _authentication_url
+      self.authentication_url if valid?
+    end
+
+    def _user
+      self.user if valid?
+    end
+  end # Base
+end # ProviderStrategies

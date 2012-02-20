@@ -17,7 +17,7 @@ module Provider
   class Authorization < Goliath::API
     def response(env)
       if %w(facebook twitter).include? params[:provider]
-        redirect = ProviderStrategies::Facebook::Authorization.new(env).call
+        redirect = ProviderStrategies::Facebook.new(env)._authentication_url
         [301, {'Location' => redirect}]
       else
         unknown_provider
@@ -27,7 +27,7 @@ module Provider
 
   class Callback < Goliath::API
     def response(env)
-      user = ProviderStrategies::Facebook::Callback.new(env).call
+      user = ProviderStrategies::Facebook.new(env)._user
       if user
         response = {
           "#{params[:provider]}_uid" => user.id
