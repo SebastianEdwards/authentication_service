@@ -4,12 +4,23 @@ require 'em-synchrony'
 require "em-synchrony/em-http"
 require 'redis/connection/synchrony'
 require 'redis'
+require 'active_record'
+require 'em-synchrony/activerecord'
 require 'goliath'
+require 'uri'
+require 'sqlite3'
+require 'logger'
+
+require './models/user'
 
 require './lib/endpoints'
 require './lib/token'
 require './lib/authorization'
 require './lib/provider'
+
+ActiveRecord::Base.establish_connection
+ActiveRecord::Base.logger = Logger.new(STDOUT)
+ActiveRecord::Base.include_root_in_json = false
 
 if ENV['REDISTOGO_URL']
   uri = URI.parse(ENV["REDISTOGO_URL"])

@@ -7,3 +7,12 @@ gem "em-http-request"
 gem "redis"
 gem "activerecord"
 gem "bcrypt-ruby"
+gem "rake"
+
+group :development, :testing do
+  gem "sqlite3"
+end
+
+group :production do
+  gem "pg"
+end
