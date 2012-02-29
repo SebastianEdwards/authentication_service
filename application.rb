@@ -13,10 +13,10 @@ require 'logger'
 
 require './models/user'
 
-require './lib/endpoints'
-require './lib/token'
 require './lib/authorization'
+require './lib/endpoints'
 require './lib/provider'
+require './lib/token'
 
 ActiveRecord::Base.establish_connection
 ActiveRecord::Base.logger = Logger.new(STDOUT)
@@ -47,10 +47,11 @@ end
 
 class AuthenticationService < Goliath::API
   use Goliath::Rack::Params
-  
-  include Directory
+
   include Authorization
   include Token
+  
+  include Directory
   include Provider
   
   def response(env)
