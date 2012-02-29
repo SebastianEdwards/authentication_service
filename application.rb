@@ -17,6 +17,7 @@ require './lib/authorization'
 require './lib/endpoints'
 require './lib/provider'
 require './lib/token'
+require './lib/users'
 
 ActiveRecord::Base.establish_connection
 ActiveRecord::Base.logger = Logger.new(STDOUT)
@@ -49,6 +50,7 @@ class AuthenticationService < Goliath::API
   use Goliath::Rack::Params
 
   include Authorization
+  include Users
   include Token
   
   include Directory
