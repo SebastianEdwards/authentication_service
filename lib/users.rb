@@ -1,9 +1,7 @@
 module Users
   def self.included(base)
     base.get '/users/:id', Show
-    base.post '/users', Create do
-      use Goliath::Rack::Validation::RequiredParam, :key => 'client_id'
-      use Goliath::Rack::Validation::RequiredParam, :key => 'redirect_uri'
+    base.post '/users', Create
     end
   end
 
