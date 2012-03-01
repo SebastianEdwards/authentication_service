@@ -8,8 +8,10 @@ require 'active_record'
 require 'em-synchrony/activerecord'
 require 'goliath'
 require 'uri'
-require 'sqlite3'
 require 'logger'
+
+require 'sqlite3' unless 'production' == ENV['RUBY_ENV']
+require 'pg' if 'production' == ENV['RUBY_ENV']
 
 require './models/user'
 
