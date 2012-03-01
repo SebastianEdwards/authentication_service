@@ -10,9 +10,6 @@ require 'goliath'
 require 'uri'
 require 'logger'
 
-require 'sqlite3' unless 'production' == ENV['RUBY_ENV']
-require 'pg' if 'production' == ENV['RUBY_ENV']
-
 require './models/user'
 
 require './lib/authorization'
