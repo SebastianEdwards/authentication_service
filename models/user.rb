@@ -11,5 +11,5 @@ class User < ActiveRecord::Base
   validates :email, :password, presence:
     {unless: -> {provider_uid && provider_type}}
   validates :provider_uid, :provider_type, presence:
-    {unless: -> {email && password}}
+    {unless: -> {email && password || password_digest}}
 end
