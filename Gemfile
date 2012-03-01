@@ -9,7 +9,7 @@ gem "activerecord"
 gem "bcrypt-ruby"
 gem "rake"
 
-group :development, :testing do
+group :development, :test do
   gem "sqlite3"
 end
 
