@@ -1,6 +1,8 @@
 require 'active_record'
 require 'logger'
-require 'sqlite3'
+
+require 'sqlite3' unless 'production' == ENV['RUBY_ENV']
+require 'pg' if 'production' == ENV['RUBY_ENV']
 
 desc "Load the environment"
 task :environment do
