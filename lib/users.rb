@@ -1,16 +1,56 @@
 module Users
   def self.included(base)
-    base.get '/users/:id', Show
+    base.get '/user', Show
+    base.put '/user', Update
     base.post '/users', Create
+  end
+
+  module Authenticatable
+    def access_token
+      @token ||= env['HTTP_AUTHENTICATION'].match(/Bearer\s+(\w+)/i)[1]
+    end
+
+    def authenticatable
+      @authenticatable ||= REDIS.get "access_token:#{access_token}"
+    end
+
+    def user
+      @user ||= _user
+    end
+
+    private
+    
+    def _user
+      User.find(REDIS.get("access_token:#{access_token}:user_id"))
     end
   end
 
   class Show < Goliath::API
+    include Authenticatable
+
     def response(env)
-      user = User.find params[:id]
-      user_json = user.to_json only:
+      [200, {'Content-Type' => 'application/JSON'}, authenticatable]
+    end
+  end
+
+  class Update < Goliath::API
+    include Authenticatable
+
+    def update_tokens
+      json = user.to_json only:
         [:authenticatable_id, :authenticatable_type]
-      [200, {'Content-Type' => 'application/JSON'}, user_json]
+      REDIS.set "refresh_token:#{refresh_token}", json
+      REDIS.set "access_token:#{access_token}", json
+      json
+    end
+
+    def refresh_token
+      REDIS.get "access_token:#{access_token}:refresh_token"
+    end
+    
+    def response(env)
+      user.update_attributes! params
+      [200, {'Content-Type' => 'application/JSON'}, update_tokens]
     end
   end
 
