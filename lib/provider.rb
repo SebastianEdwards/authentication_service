@@ -1,3 +1,4 @@
+require_relative './mixins/code_builder'
 require_relative './provider_strategies/facebook'
 
 module Provider
@@ -26,13 +27,17 @@ module Provider
   end
 
   class Callback < Goliath::API
+    include CodeBuilder
+
     def response(env)
-      user = ProviderStrategies::Facebook.new(env)._user
+      external_user = ProviderStrategies::Facebook.new(env)._user
+      user = User.find_or_create_by_provider_type_and_provider_uid(\
+        params[:provider], external_user.id)
       if user
-        response = {
-          "#{params[:provider]}_uid" => user.id
-        }
-        [200, {'Content-Type' => 'application/JSON'}, response.to_json]
+        code = build_code(user, nil)
+        query = Rack::Utils.build_query({code: code})
+        redirect_url = params[:redirect_uri] + '?' + query
+        [200, {'Content-Type' => 'application/JSON'}, redirect_url]
       else
         error = {error: "Can't get user."}
         [400, {'Content-Type' => 'application/JSON'}, error.to_json]

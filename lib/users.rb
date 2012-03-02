@@ -1,3 +1,5 @@
+require_relative './mixins/code_builder'
+
 module Users
   def self.included(base)
     base.get '/user', Show
@@ -55,12 +57,7 @@ module Users
   end
 
   class Create < Goliath::API
-    def build_code
-      code = SecureRandom.hex(8)
-      REDIS.set "code:#{code}",
-        {user_id: @user.id, client_id: 1}.to_json
-      code
-    end
+    include CodeBuilder
 
     def forwardable_params
       params.select do |k,v|
@@ -70,9 +67,10 @@ module Users
     end
 
     def response(env)
-      @user = User.create!(params)
+      user = User.create!(params)
+      code = build_code(user, nil)
       query = Rack::Utils.build_query \
-        forwardable_params.merge({code: build_code})
+        forwardable_params.merge({code: code})
       redirect_url = params[:redirect_uri] + '?' + query
       [200, {'Content-Type' => 'application/JSON'}, redirect_url]
     end
