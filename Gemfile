@@ -5,7 +5,6 @@ gem "hiredis"
 gem "em-synchrony", git: "https://github.com/igrigorik/em-synchrony.git"
 gem "em-http-request"
 gem "redis-scripted"
-gem "activerecord"
 gem "bcrypt-ruby"
 gem "rake"
 

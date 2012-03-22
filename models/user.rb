@@ -1,15 +1,16 @@
-class User < ActiveRecord::Base
-  has_many :authorizations
-  has_secure_password
-  attr_accessible :email,
-                  :password,
-                  :provider_uid,
-                  :provider_type,
-                  :authenticatable_id,
-                  :authenticatable_type
+class User < BaseModel
+  namespace 'user'
 
-  validates :email, :password, presence:
-    {unless: -> {provider_uid && provider_type}}
-  validates :provider_uid, :provider_type, presence:
-    {unless: -> {email && password || password_digest}}
+  def valid?
+    valid_via_email? || valid_via_provider?
+  end
+
+  private
+  def valid_via_email?
+    attributes.has_key?('email') && attributes.has_key?('password_digest')
+  end
+
+  def valid_via_provider?
+    attributes.has_key?('provider_uid') && attributes.has_key?('provider_type')
+  end
 end
