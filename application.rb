@@ -3,7 +3,7 @@ require 'hiredis'
 require 'em-synchrony'
 require "em-synchrony/em-http"
 require 'redis/connection/synchrony'
-require 'redis'
+require 'redis/scripted'
 require 'active_record'
 require 'em-synchrony/activerecord'
 require 'goliath'
@@ -30,7 +30,7 @@ if ENV['REDISTOGO_URL']
     password: uri.password
   })
 else
-  REDIS = Redis.new
+  REDIS = Redis::Scripted.new(scripts_path: "./lib/scripts")
 end
 
 def base_url
