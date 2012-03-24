@@ -8,14 +8,14 @@ require 'goliath'
 require 'uri'
 require 'logger'
 
-require './models/base_model'
+require './models/redis_model'
 require './models/user'
 
-require './lib/authorization'
-require './lib/endpoints'
-require './lib/provider'
-require './lib/token'
-require './lib/users'
+require './controllers/authorization'
+require './controllers/endpoints'
+require './controllers/provider'
+require './controllers/token'
+require './controllers/users'
 
 if ENV['REDISTOGO_URL']
   uri = URI.parse(ENV["REDISTOGO_URL"])
@@ -25,7 +25,7 @@ if ENV['REDISTOGO_URL']
     password: uri.password
   })
 else
-  REDIS = Redis::Scripted.new(scripts_path: "./lib/scripts")
+  REDIS = Redis::Scripted.new(scripts_path: "./scripts")
 end
 
 def base_url
