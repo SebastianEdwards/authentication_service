@@ -1,4 +1,4 @@
-class BaseModel
+class RedisModel
   attr_accessor :attributes
 
   def self.find(key)

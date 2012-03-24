@@ -1,4 +1,4 @@
-class User < BaseModel
+class User < RedisModel
   namespace 'user'
 
   def valid?
