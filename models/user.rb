@@ -1,5 +1,6 @@
 class User < RedisModel
-  namespace 'user'
+  namespace :user
+  id_type :sequential
 
   def valid?
     valid_via_email? || valid_via_provider?
