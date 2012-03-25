@@ -19,15 +19,7 @@ module ProviderStrategies
         client_id: params[:client_id]
       }
       redirect_query = build_query(query)
-      base_url + "/#{params[:provider]}/callback?" + redirect_query
-    end
-
-    def _authentication_url
-      self.authentication_url if valid?
-    end
-
-    def _user
-      self.user if valid?
+      'http://' + env["HTTP_HOST"] + "/#{params[:provider]}/callback?" + redirect_query
     end
   end # Base
 end # ProviderStrategies

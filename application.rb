@@ -21,18 +21,6 @@ if ENV['REDISTOGO_URL']
     password: uri.password
   })
 else
-end
-
-def base_url
-  'http://' + env["HTTP_HOST"]
-end
-
-def providers_from_env
-  ENV['AUTH_PROVIDERS'].split(/[\s,]+/) if ENV['AUTH_PROVIDERS']
-end
-
-def providers
-  @providers ||= providers_from_env || []
   REDIS = Redis.new
 end
 

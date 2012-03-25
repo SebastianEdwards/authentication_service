@@ -11,7 +11,7 @@ module ProviderStrategies
           send "#{k}=", v if respond_to? "#{k}="
         end
       end
-    end
+    end # Token
 
     class User
       attr_accessor :id
@@ -21,7 +21,7 @@ module ProviderStrategies
           send "#{k}=", v if respond_to? "#{k}="
         end
       end
-    end
+    end # User
 
     def valid?
       params[:provider] == 'facebook' &&
@@ -63,5 +63,9 @@ module ProviderStrategies
     def user
       @user ||= User.new(fetch_user)
     end
-  end
-end
+
+    def uid
+      user.id
+    end
+  end # Facebook
+end # ProviderStrategies
