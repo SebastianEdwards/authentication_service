@@ -50,8 +50,6 @@ GEM
       rack-accept-media-types (>= 0.6)
     rake (0.9.2.2)
     redis (2.2.2)
-    redis-scripted (0.0.3)
-      redis
     rspec (2.9.0)
       rspec-core (~> 2.9.0)
       rspec-expectations (~> 2.9.0)
@@ -75,6 +73,6 @@ DEPENDENCIES
   hiredis
   pg
   rake
-  redis-scripted
+  redis
   rspec
   sqlite3
