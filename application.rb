@@ -3,7 +3,7 @@ require 'hiredis'
 require 'em-synchrony'
 require "em-synchrony/em-http"
 require 'redis/connection/synchrony'
-require 'redis/scripted'
+require 'redis'
 require 'goliath'
 require 'uri'
 require 'logger'
@@ -25,7 +25,6 @@ if ENV['REDISTOGO_URL']
     password: uri.password
   })
 else
-  REDIS = Redis::Scripted.new(scripts_path: "./scripts")
 end
 
 def base_url
@@ -38,6 +37,7 @@ end
 
 def providers
   @providers ||= providers_from_env || []
+  REDIS = Redis.new
 end
 
 class AuthenticationService < Goliath::API
