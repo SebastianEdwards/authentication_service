@@ -27,21 +27,16 @@ module ProvidersController
   end # Authorization
 
   class Callback < Goliath::API
-    # include CodeBuilder
-
     def response(env)
       if provider = Provider[params[:provider]]
         uid = provider.uid(env)
-        [200, {'Content-Type' => 'application/JSON'}, uid]
-      #   if user
-      #     code = build_code(user, nil)
-      #     query = Rack::Utils.build_query({code: code})
-      #     redirect_url = params[:redirect_uri] + '?' + query
-      #     [200, {'Content-Type' => 'application/JSON'}, redirect_url]
-      #   else
-      #     error = {error: "Can't get user."}
-      #     [400, {'Content-Type' => 'application/JSON'}, error.to_json]
-      #   end
+        user_id = REDIS.HGET(provider.name, uid)
+        user = (user_id ? User.find(user_id) : (u = User.new; u.save; u))
+        code = Code.new({user_id: user.id, client_id: 1})
+        code.save
+        query = Rack::Utils.build_query({code: code.id})
+        redirect_url = params[:redirect_uri] + '?' + query
+        [200, {'Content-Type' => 'application/JSON'}, redirect_url]
       end
     end
   end # Callback
