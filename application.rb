@@ -39,12 +39,11 @@ end
 class AuthenticationService < Goliath::API
   use Goliath::Rack::Params
 
-  include Authorization
-  include Users
-  include Token
-  
-  include Directory
-  include Provider
+  include AuthorizationsController
+  include EndpointsController
+  include ProvidersController
+  include UsersController
+  include TokensController
   
   def response(env)
     error = {error: 'Invalid route.'}

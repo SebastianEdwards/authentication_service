@@ -1,4 +1,4 @@
-module Directory
+module EndpointsController
   def self.included(base)
     base.get '/', Endpoints
   end
@@ -6,9 +6,11 @@ module Directory
   class Endpoints < Goliath::API
     def endpoint_urls
       endpoints = {}
-      endpoints[:authorize_url] = base_url + '/authorize'
-      endpoints[:token_url] = base_url + '/token'
-      providers.each {|provider| endpoints[provider + '_url'] = base_url + "/#{provider}"}
+      endpoints[:authorize_url] = '/authorize'
+      endpoints[:token_url] = '/token'
+      Provider.all.each do |provider|
+        endpoints[provider.name + '_url'] = provider.endpoint_url
+      end
       endpoints
     end
 

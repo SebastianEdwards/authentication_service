@@ -1,6 +1,4 @@
-require_relative './mixins/code_builder'
-
-module Users
+module UsersController
   def self.included(base)
     base.get '/user', Show
     base.put '/user', Update
@@ -57,8 +55,6 @@ module Users
   end
 
   class Create < Goliath::API
-    include CodeBuilder
-
     def forwardable_params
       params.select do |k,v|
         !%w{email password password_confirmation client_id redirect_uri}\

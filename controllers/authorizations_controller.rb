@@ -1,4 +1,4 @@
-module Authorization
+module AuthorizationsController
   def self.included(base)
     base.get '/authorize', New do
       use Goliath::Rack::Validation::RequiredParam, :key => 'client_id'

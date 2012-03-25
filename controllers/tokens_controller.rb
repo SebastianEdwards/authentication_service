@@ -1,4 +1,4 @@
-module Token
+module TokensController
   def self.included(base)
     base.post '/token', Create
   end
