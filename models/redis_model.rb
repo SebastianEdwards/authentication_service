@@ -1,5 +1,6 @@
 class RedisModel
   attr_accessor :attributes
+  attr_reader :id
 
   def self.find(id)
     if json = REDIS.get("#{namespace}:#{id}")
