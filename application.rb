@@ -9,13 +9,9 @@ require 'uri'
 require 'logger'
 
 require './models/redis_model'
-require './models/user'
-
-require './controllers/authorization'
-require './controllers/endpoints'
-require './controllers/provider'
-require './controllers/token'
-require './controllers/users'
+%w{models lib controllers}.each do |dir|
+  Dir["./#{dir}/*.rb"].each {|file| require(file.gsub(/\.rb/, '')) }
+end
 
 if ENV['REDISTOGO_URL']
   uri = URI.parse(ENV["REDISTOGO_URL"])
