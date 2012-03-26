@@ -1,3 +1,5 @@
+require 'securerandom'
+
 class RedisModel
   attr_accessor :attributes
   attr_reader :id
