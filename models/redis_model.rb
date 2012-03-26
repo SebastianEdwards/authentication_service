@@ -74,6 +74,6 @@ class RedisModel
   end
 
   def to_json
-    (@id ? attributes.merge(id: @id) : attributes).to_json
+    attributes.to_json
   end
 end
