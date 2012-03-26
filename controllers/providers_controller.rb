@@ -25,8 +25,8 @@ module ProvidersController
 
     def response(env)
       provider = Provider[params[:provider]]
-      redirect = provider.authentication_url(env)
-      [301, {'Location' => redirect}]
+      redirect_url = provider.authentication_url(env)
+      [301, {'Location' => redirect_url}]
     end
   end # Authorization
 
