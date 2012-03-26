@@ -47,7 +47,7 @@ module ProvidersController
         code.save
         query = Rack::Utils.build_query({code: code.id})
         redirect_url = params[:redirect_uri] + '?' + query
-        [200, {'Content-Type' => 'application/JSON'}, redirect_url]
+        [301, {'Location' => redirect_url}]
       end
     end
   end # Callback
