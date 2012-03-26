@@ -64,6 +64,15 @@ class RedisModel
     end
   end
 
+  def method_missing(method_sym)
+    key = method_sym.to_s
+    if attributes.has_key?(key)
+      attributes[key]
+    else
+      super
+    end
+  end
+
   def to_json
     (@id ? attributes.merge(id: @id) : attributes).to_json
   end
