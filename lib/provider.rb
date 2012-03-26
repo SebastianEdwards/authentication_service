@@ -20,7 +20,7 @@ class Provider
   end
 
   def endpoint_url
-    "/#{@name}"
+    "/providers/#{@name}"
   end
 
   def best_strategy(env)
