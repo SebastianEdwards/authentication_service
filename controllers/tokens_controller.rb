@@ -32,6 +32,23 @@ module TokensController
       end
     end
 
+    def refresh_token_grant_type
+      if refresh_token = RefreshToken.find(params[:refresh_token])
+        access_token = AccessToken.new refresh_token.attributes
+        refresh_token = RefreshToken.new refresh_token.attributes
+        if access_token.save && refresh_token.save
+          response = {
+            access_token: access_token.id,
+            refresh_token: refresh_token.id
+          }
+          [200, {'Content-Type' => 'application/JSON'}, response.to_json]
+        end
+      else
+        message = "Invalid or expired refresh_token."
+        raise Goliath::Validation::Error.new(400, message)
+      end
+    end
+
     def response(env)
       case params[:grant_type]
       when 'code'
