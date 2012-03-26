@@ -38,3 +38,18 @@ class AuthenticationService < Goliath::API
     [404, {'Content-Type' => 'application/JSON'}, error.to_json]
   end
 end
+
+module Goliath
+  module Rack
+    module Validator
+      def validation_error(status_code, msg, headers={})
+        headers.delete('Content-Length')
+        unless headers.has_key?('Content-Type')
+          headers.merge!({'Content-Type' => 'application/JSON'})
+        end
+        msg = {error: msg} if msg.class == String
+        [status_code, headers, msg.to_json]
+      end
+    end
+  end
+end
