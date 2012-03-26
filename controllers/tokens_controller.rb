@@ -1,29 +1,32 @@
 module TokensController
   def self.included(base)
-    base.post '/token', Create
+    base.post '/tokens', Create
   end
 
-  class Create < Goliath::API
-    def code_grant_type
-      if code_json = REDIS.get("code:#{params[:code]}")
-        code_hash = JSON.parse(code_json)
-        user = User.find(code_hash['user_id'])
-        refresh_token = SecureRandom.hex
-        access_token = SecureRandom.hex
-        access_token_json = user.to_json only:
-          [:authenticatable_id, :authenticatable_type]
-        REDIS.set "refresh_token:#{refresh_token}", access_token_json
-        REDIS.set "access_token:#{access_token}", access_token_json
-        REDIS.set "access_token:#{access_token}:user_id", user.id
-        REDIS.set "access_token:#{access_token}:refresh_token", refresh_token
-        response = {access_token: access_token, refresh_token: refresh_token}
-        [200, {'Content-Type' => 'application/JSON'}, response.to_json]
-      end
-    end
+  GRANT_TYPES = %w{code refresh_token password}
 
-    def no_grant_type
-      error = {error: 'No grant type specified.'}
-      [400, {'Content-Type' => 'application/JSON'}, error.to_json]
+  class Create < Goliath::API
+    use Goliath::Rack::Validation::RequiredParam, {
+      :key => 'grant_type',
+      :message => 'parameter missing.'
+    }
+    use Goliath::Rack::Validation::RequiredValue, {
+      :key => 'grant_type',
+      :values => GRANT_TYPES
+    }
+
+    def code_grant_type
+      if code = Code.find(params[:code])
+        access_token = AccessToken.new code.attributes
+        refresh_token = RefreshToken.new code.attributes
+        if access_token.save && refresh_token.save
+          response = {
+            access_token: access_token.id,
+            refresh_token: refresh_token.id
+          }
+          [200, {'Content-Type' => 'application/JSON'}, response.to_json]
+        end
+      end
     end
 
     def response(env)
@@ -34,8 +37,6 @@ module TokensController
         refresh_token_grant_type
       when 'password'
         password_grant_type
-      else
-        no_grant_type
       end
     end
   end
