@@ -41,11 +41,11 @@ class RedisModel
   end
 
   def self.generate_secure_random_8_id
-    generate_secure_random(8)
+    generate_secure_random(4)
   end
 
   def self.generate_secure_random_16_id
-    generate_secure_random(16)
+    generate_secure_random(8)
   end
 
   def initialize(attributes = {}, id = nil)
