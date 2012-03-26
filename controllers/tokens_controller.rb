@@ -26,6 +26,9 @@ module TokensController
           }
           [200, {'Content-Type' => 'application/JSON'}, response.to_json]
         end
+      else
+        message = "Invalid or expired code."
+        raise Goliath::Validation::Error.new(400, message)
       end
     end
 
