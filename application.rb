@@ -2,8 +2,8 @@ require 'json'
 require 'hiredis'
 require 'em-synchrony'
 require "em-synchrony/em-http"
-require 'redis/connection/synchrony'
 require 'redis'
+require 'redis/connection/synchrony'
 require 'goliath'
 require 'uri'
 require 'logger'
@@ -14,14 +14,16 @@ require './models/redis_model'
 end
 
 if ENV['REDISTOGO_URL']
-  uri = URI.parse(ENV["REDISTOGO_URL"])
-  REDIS = Redis.new({
-    host:     uri.host,
-    port:     uri.port,
-    password: uri.password
-  })
+  REDIS = EM::Synchrony::ConnectionPool.new(size: 2) do
+    uri = URI.parse(ENV["REDISTOGO_URL"])
+    Redis.new({
+      host:     uri.host,
+      port:     uri.port,
+      password: uri.password
+    })
+  end
 else
-  REDIS = Redis.new
+  REDIS = EM::Synchrony::ConnectionPool.new(size: 2) { Redis.new }
 end
 
 class AuthenticationService < Goliath::API
