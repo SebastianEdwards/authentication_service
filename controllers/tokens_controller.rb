@@ -49,6 +49,25 @@ module TokensController
       end
     end
 
+    def password_grant_type
+      key = "#{params[:username]}:#{params[:password]}"
+      if user_id = REDIS.hget('password', key)
+        attributes = {user_id: 1, client_id:1}
+        access_token = AccessToken.new attributes
+        refresh_token = RefreshToken.new attributes
+        if access_token.save && refresh_token.save
+          response = {
+            access_token: access_token.id,
+            refresh_token: refresh_token.id
+          }
+          [200, {'Content-Type' => 'application/JSON'}, response.to_json]
+        end
+      else
+        message = "Invalid credentials."
+        raise Goliath::Validation::Error.new(400, message)
+      end
+    end
+
     def response(env)
       case params[:grant_type]
       when 'code'
