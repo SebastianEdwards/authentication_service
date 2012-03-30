@@ -26,7 +26,7 @@ module ProvidersController
     def response(env)
       provider = Provider[params[:provider]]
       redirect_url = provider.authentication_url(env)
-      [301, {'Location' => redirect_url}]
+      [302, {'Location' => redirect_url}]
     end
   end # Authorization
 
@@ -47,7 +47,7 @@ module ProvidersController
         code.save
         query = Rack::Utils.build_query({code: code.id})
         redirect_url = params[:redirect_uri] + '?' + query
-        [301, {'Location' => redirect_url}]
+        [302, {'Location' => redirect_url}]
       end
     end
   end # Callback
