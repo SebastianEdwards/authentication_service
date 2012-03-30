@@ -1,7 +1,7 @@
 module ProvidersController
   def self.included(base)
-    base.get 'providers/:provider', Authorization
-    base.get '/:provider/callback', Callback
+    base.get '/providers/:provider/callback', Callback
+    base.get '/providers/:provider', Authorization
   end
 
   module CommonValidations
