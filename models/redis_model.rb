@@ -20,6 +20,15 @@ class RedisModel
     self.class.namespace
   end
 
+  def self.expires_in(expires_in = nil)
+    @expires_in = expires_in if expires_in
+    @expires_in
+  end
+
+  def expires_in
+    self.class.expires_in
+  end
+
   def self.generate_id
     send "generate_#{@id_type}_id"
   end
@@ -58,7 +67,14 @@ class RedisModel
   def save
     if valid?
       @id ||= self.class.generate_id
-      'OK' == REDIS.set("#{namespace}:#{@id}", attributes.to_json)
+      key = "#{namespace}:#{@id}"
+      if 'OK' == REDIS.set(key, attributes.to_json)
+        if expires_in
+          REDIS.expire(key, expires_in)
+        else
+          true
+        end
+      end
     else
       raise "Invalid attributes".inspect
     end
