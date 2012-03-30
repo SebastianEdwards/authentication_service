@@ -52,7 +52,7 @@ module TokensController
     def password_grant_type
       key = "#{params[:username]}:#{params[:password]}"
       if user_id = REDIS.hget('password', key)
-        attributes = {user_id: 1, client_id:1}
+        attributes = {user_id: user_id, client_id:1}
         access_token = AccessToken.new attributes
         refresh_token = RefreshToken.new attributes
         if access_token.save && refresh_token.save
