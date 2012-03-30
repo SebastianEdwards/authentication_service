@@ -41,6 +41,7 @@ GEM
       url_mount (~> 0.2.1)
     log4r (1.1.10)
     multi_json (1.0.4)
+    oauth (0.4.5)
     pg (0.13.2)
     rack (1.4.1)
     rack-accept-media-types (0.9)
@@ -71,6 +72,7 @@ DEPENDENCIES
   em-synchrony!
   goliath
   hiredis
+  oauth
   pg
   rake
   redis

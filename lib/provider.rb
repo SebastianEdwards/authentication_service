@@ -1,4 +1,5 @@
 require_relative './provider_strategies/facebook'
+require_relative './provider_strategies/linkedin'
 
 class Provider
   attr_reader :name
@@ -40,7 +41,7 @@ class Provider
   end
 
   def strategies
-    [ProviderStrategies::Facebook]
+    [ProviderStrategies::Facebook, ProviderStrategies::Linkedin]
   end
 
   if ENV['AUTH_PROVIDERS']
