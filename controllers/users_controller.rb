@@ -11,7 +11,7 @@ module UsersController
     end
 
     def user
-      @user ||= User.find(access_token.user_id)
+      @user ||= User.find(access_token.user_id) if access_token
     end
   end
 
@@ -19,7 +19,12 @@ module UsersController
     include Authenticatable
 
     def response(env)
-      [200, {'Content-Type' => 'application/JSON'}, user.to_json]
+      if user
+        [200, {'Content-Type' => 'application/JSON'}, user.to_json]
+      else
+        message = "Invalid or expired access_token."
+        raise Goliath::Validation::Error.new(400, message)
+      end
     end
   end
 
