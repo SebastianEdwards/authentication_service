@@ -4,11 +4,25 @@ class RedisModel
   attr_accessor :attributes
   attr_reader :id
 
+  def self.create(attributes = {})
+    object = self.new(attributes)
+
+    object.save ? object : false
+  end
+
+  def self.create!(attributes = {}, status = 400, msg = "Error creating object.")
+    create(attributes) or raise Goliath::Validation::Error.new(status, msg)
+  end
+
   def self.find(id)
     if json = REDIS.get("#{namespace}:#{id}")
       attributes = JSON.parse(json)
       self.new(attributes, id)
     end
+  end
+
+  def self.find!(id, status = 400, msg = "Invalid ID.")
+    find(id) or raise Goliath::Validation::Error.new(status, msg)
   end
 
   def self.namespace(namespace = nil)
@@ -64,11 +78,17 @@ class RedisModel
 
   def valid?; true; end
 
+  def before_validation; end
+
+  def after_save; end
+
   def save
+    before_validation
     if valid?
       @id ||= self.class.generate_id
       key = "#{namespace}:#{@id}"
       if 'OK' == REDIS.set(key, attributes.to_json)
+        after_save
         if expires_in
           REDIS.expire(key, expires_in)
         else

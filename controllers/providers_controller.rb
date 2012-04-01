@@ -24,6 +24,8 @@ module ProvidersController
     include CommonValidations
 
     def response(env)
+      client = Client.find!(params[:client_id])
+      client.validate_url!(params[:redirect_uri])
       provider = Provider[params[:provider]]
       redirect_url = provider.authentication_url(env)
       [302, {'Location' => redirect_url}]
@@ -34,21 +36,18 @@ module ProvidersController
     include CommonValidations
 
     def response(env)
-      if provider = Provider[params[:provider]]
-        uid = provider.uid(env)
-        if user_id = REDIS.HGET(provider.name, uid)
-          user = User.find(user_id)
-        else
-          user = User.new
-          user.save
-          REDIS.HSET provider.name, uid, user.id
-        end
-        code = Code.new({user_id: user.id, client_id: 1})
-        code.save
-        query = Rack::Utils.build_query({code: code.id})
-        redirect_url = params[:redirect_uri] + '?' + query
-        [302, {'Location' => redirect_url}]
+      client = Client.find!(params[:client_id])
+      client.validate_url!(params[:redirect_uri])
+      provider = Provider[params[:provider]]
+      provider_uid = provider.uid(env)
+      unless user = User.find_by_provider_and_uid(provider.name, provider_uid)
+        user = User.create!({}, 400, "Error creating user.")
+        user.associate_with_provider!(provider.name, provider_uid)
       end
+      code = Code.create!({user_id: user.id, client_id: client.id})
+      query = Rack::Utils.build_query({code: code.id})
+      redirect_url = params[:redirect_uri] + '?' + query
+      [302, {'Location' => redirect_url}]
     end
   end # Callback
 end # ProvidersController

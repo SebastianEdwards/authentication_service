@@ -11,7 +11,10 @@ module UsersController
     end
 
     def user
-      @user ||= User.find(access_token.user_id) if access_token
+      if access_token
+        user_id = access_token.user_id!
+        @user ||= User.find!(user_id)
+      end
     end
   end
 
@@ -50,21 +53,36 @@ module UsersController
   end
 
   class Create < Goliath::API
-    def storable_params
+    %w{client_id redirect_uri}.each do |attribute|
+      use Goliath::Rack::Validation::RequiredParam, {
+        :key => attribute,
+        :message => 'parameter missing.'
+      }
+    end
+
+    def user_params
       params.select do |k,v|
-        !%w{password password_confirmation client_id redirect_uri}\
-          .include? k
+        !%w{client_id redirect_uri}.include? k
       end
     end
 
     def response(env)
-      user = User.new(storable_params)
-      user.save
-      code = Code.new({user_id: user.id, client_id: 1})
-      code.save
-      query = Rack::Utils.build_query({code: code.id})
-      redirect_url = params[:redirect_uri] + '?' + query
-      [301, {'Location' => redirect_url}]
+      if client = Client.find(params[:client_id])
+        unless client.valid_url(params[:redirect_uri])
+          message = "Invalid redirect_uri for given client."
+          raise Goliath::Validation::Error.new(400, message)
+        end
+        user = User.new(user_params)
+        user.save
+        code = Code.new({user_id: user.id, client_id: client.id})
+        code.save
+        query = Rack::Utils.build_query({code: code.id})
+        redirect_url = params[:redirect_uri] + '?' + query
+        [301, {'Location' => redirect_url}]
+      else
+        message = "Invalid client_id."
+        raise Goliath::Validation::Error.new(400, message)
+      end
     end
   end
 end
