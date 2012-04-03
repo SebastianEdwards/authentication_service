@@ -19,4 +19,8 @@ class Client < RedisModel
   def validate_secret!(value, status = 400, msg = "Invalid client_secret.")
     validate_secret(value) or raise Goliath::Validation::Error.new(status, msg)
   end
+
+  def authorize_scope(scope)
+    scope.select {|requested_scope| available_scopes.include? requested_scope}
+  end
 end
