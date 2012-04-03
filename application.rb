@@ -31,6 +31,7 @@ class AuthenticationService < Goliath::API
 
   include AuthorizationsController
   include EndpointsController
+  include PermissionsController
   include ProvidersController
   include UsersController
   include TokensController

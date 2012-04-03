@@ -49,7 +49,7 @@ module TokensController
 
     def password_grant_type(client, granted_scope)
       if user = User.find_by_username_and_password!(params[:username], params[:password])
-        attributes = {user_id: user.id, client_id: client.id}
+        attributes = { client_id: client.id, scope: granted_scope, user_id: user.id }
         access_token = AccessToken.create! attributes
         refresh_token = RefreshToken.create! attributes
         response = {
