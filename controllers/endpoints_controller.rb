@@ -1,21 +1,16 @@
 module EndpointsController
   def self.included(base)
-    base.get '/', Endpoints
+    base.get '/', Show
   end
 
-  class Endpoints < Goliath::API
-    def endpoint_urls
-      endpoints = {}
-      endpoints[:authorize_url] = '/authorize'
-      endpoints[:token_url] = '/token'
-      Provider.all.each do |provider|
-        endpoints[provider.name + '_url'] = provider.endpoint_url
-      end
-      endpoints
-    end
+  class Show < Goliath::API
+    include HATEOAS
 
     def response(env)
-      [200, {'Content-Type' => 'application/JSON'}, endpoint_urls.to_json]
+      add_link '/oauth2/authorize', '/authorize'
+      add_link '/oauth2/token', '/token'
+      add_link '/auth/providers', '/providers' if Provider.all.count >= 1
+      generate_response
     end
   end
 end

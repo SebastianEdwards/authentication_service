@@ -2,6 +2,7 @@ module ProvidersController
   def self.included(base)
     base.get '/providers/:provider/callback', Callback
     base.get '/providers/:provider', Authorization
+    base.get '/providers', Show
   end
 
   module CommonValidations
@@ -17,6 +18,18 @@ module ProvidersController
           :message => 'query parameter missing.'
         }
       end
+    end
+  end
+
+  class Show < Goliath::API
+    include HATEOAS
+
+    def response(env)
+      add_link 'self', '/providers'
+      Provider.all.each do |provider|
+        add_link "/auth/provider/#{provider.name}", provider.endpoint_url
+      end
+      generate_response
     end
   end
 
