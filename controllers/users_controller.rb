@@ -1,5 +1,6 @@
 module UsersController
   def self.included(base)
+    base.get '/~', Show
     base.get '/users', Show
     base.put '/users', Update
     base.post '/users', Create
