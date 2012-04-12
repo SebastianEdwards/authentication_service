@@ -1,6 +1,6 @@
 module TokensController
   def self.included(base)
-    base.post '/tokens', Create
+    base.post '/token', Create
   end
 
   GRANT_TYPES = %w{code refresh_token password client_credentials}
