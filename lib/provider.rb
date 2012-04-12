@@ -40,6 +40,10 @@ class Provider
     strategy(env).uid
   end
 
+  def prompt
+    "Sign in with #{name}"
+  end
+
   def strategies
     [ProviderStrategies::Facebook, ProviderStrategies::Linkedin]
   end

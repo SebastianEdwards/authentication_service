@@ -27,7 +27,7 @@ module ProvidersController
     def response(env)
       add_link 'self', '/providers'
       Provider.all.each do |provider|
-        add_link "/auth/provider/#{provider.name}", provider.endpoint_url
+        add_link "/auth/provider/#{provider.name}", provider.endpoint_url, {:prompt => provider.prompt}
       end
       generate_response
     end
