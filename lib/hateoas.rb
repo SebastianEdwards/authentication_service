@@ -31,11 +31,11 @@ module HATEOAS
     end
 
     def content
-      @content.respond_to?(:merge) ? @content : {data: content}
+      @content.respond_to?(:merge) ? @content : {items: @content}
     end
 
     def to_json
-      content.merge({links: @links}).to_json
+      {collection: content.merge({links: @links})}.to_json
     end
   end
 end
