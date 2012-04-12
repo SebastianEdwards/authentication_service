@@ -33,7 +33,7 @@ class AuthenticationService < Goliath::API
   include EndpointsController
   include PermissionsController
   include ProvidersController
-  include UsersController
+  include ResourceOwnersController
   include TokensController
   
   def response(env)

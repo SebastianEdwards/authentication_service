@@ -6,6 +6,6 @@ class Code < RedisModel
   expires_in 15
 
   def valid?
-    attributes.has_key?(:client_id) && attributes.has_key?(:user_id)
+    attributes.has_key?(:client_id) && attributes.has_key?(:resource_owner_id)
   end
 end

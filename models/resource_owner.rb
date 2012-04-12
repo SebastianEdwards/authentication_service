@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
-class User < RedisModel
-  namespace :user
+class ResourceOwner < RedisModel
+  namespace :resource_owner
   id_type :sequential
 
   def self.hash(string)
@@ -20,12 +20,12 @@ class User < RedisModel
   end
 
   def self.find_by_provider_and_uid(provider_name, uid)
-    user_id = REDIS.hget(provider_name, uid)
+    resource_owner_id = REDIS.hget(provider_name, uid)
     
-    user_id ? find(user_id) : nil
+    resource_owner_id ? find(resource_owner_id) : nil
   end
 
-  def self.find_by_provider_and_uid!(provider_name, uid, status = 400, msg = "No matching user.")
+  def self.find_by_provider_and_uid!(provider_name, uid, status = 400, msg = "No matching resource_owner.")
     find_by_provider_and_uid(provider_name, uid) or raise Goliath::Validation::Error.new(status, msg)
   end
 

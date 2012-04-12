@@ -1,8 +1,8 @@
-module UsersController
+module ResourceOwnersController
   def self.included(base)
     base.get '/~', Show
-    base.put '/users', Update
-    base.post '/users', Create
+    base.put '/~', Update
+    base.post '/~', Create
   end
 
   module Authenticatable
@@ -10,10 +10,10 @@ module UsersController
       @access_token ||= AccessToken.find(env['HTTP_AUTHENTICATION'].match(/Bearer\s+(\w+)/i)[1])
     end
 
-    def user
+    def resource_owner
       if access_token
-        user_id = access_token.user_id!
-        @user ||= User.find!(user_id)
+        resource_owner_id = access_token.resource_owner_id!
+        @resource_owner ||= ResourceOwner.find!(resource_owner_id)
       end
     end
   end
@@ -23,9 +23,9 @@ module UsersController
     include Authenticatable
 
     def response(env)
-      if user
+      if resource_owner
         add_link 'self', '/~'
-        generate_response([user])
+        generate_response([resource_owner])
       else
         message = "Invalid or expired access_token."
         raise Goliath::Validation::Error.new(400, message)
@@ -37,7 +37,7 @@ module UsersController
     include Authenticatable
 
     def update_tokens
-      json = user.to_json only:
+      json = resource_owner.to_json only:
         [:authenticatable_id, :authenticatable_type]
       REDIS.set "refresh_token:#{refresh_token}", json
       REDIS.set "access_token:#{access_token}", json
@@ -49,7 +49,7 @@ module UsersController
     end
     
     def response(env)
-      user.update_attributes! params
+      resource_owner.update_attributes! params
       [200, {'Content-Type' => 'application/JSON'}, update_tokens]
     end
   end
@@ -62,7 +62,7 @@ module UsersController
       }
     end
 
-    def user_params
+    def resource_owner_params
       params.select do |k,v|
         !%w{client_id redirect_uri}.include? k
       end
@@ -74,9 +74,9 @@ module UsersController
           message = "Invalid redirect_uri for given client."
           raise Goliath::Validation::Error.new(400, message)
         end
-        user = User.new(user_params)
-        user.save
-        code = Code.new({user_id: user.id, client_id: client.id})
+        resource_owner = ResourceOwner.new(resource_owner_params)
+        resource_owner.save
+        code = Code.new({resource_owner_id: resource_owner.id, client_id: client.id})
         code.save
         query = Rack::Utils.build_query({code: code.id})
         redirect_url = params[:redirect_uri] + '?' + query
