@@ -19,11 +19,13 @@ module UsersController
   end
 
   class Show < Goliath::API
+    include HATEOAS
     include Authenticatable
 
     def response(env)
       if user
-        [200, {'Content-Type' => 'application/JSON'}, user.to_json]
+        add_link 'self', '/~'
+        generate_response([user])
       else
         message = "Invalid or expired access_token."
         raise Goliath::Validation::Error.new(400, message)
