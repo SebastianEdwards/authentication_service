@@ -25,6 +25,7 @@ module ProvidersController
     include HATEOAS
 
     def response(env)
+      add_header 'Cache-Control', 'max-age=3600, must-revalidate'
       add_link 'self', '/providers'
       Provider.all.each do |provider|
         add_link "/auth/provider/#{provider.name}", provider.endpoint_url, {:prompt => provider.prompt}
