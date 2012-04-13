@@ -26,14 +26,13 @@ module ProvidersController
 
     def response(env)
       add_header 'Cache-Control', 'max-age=3600, must-revalidate'
-      add_link 'self', '/providers'
       Provider.all.each do |provider|
         add_item provider.endpoint_url, do |item|
           item.add_data('name', provider.name)
           item.add_data('prompt', provider.prompt)
         end
       end
-      generate_response
+      generate_response '/providers'
     end
   end
 

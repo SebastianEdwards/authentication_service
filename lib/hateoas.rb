@@ -47,8 +47,9 @@ module HATEOAS
     @links << opts.merge({rel: rel, href: href})
   end
 
-  def generate_response
-    collection = {links: links}
+  def generate_response(href)
+    collection = {href: href}
+    collection.merge!({links: links}) if links.length > 0
     collection.merge!({items: items}) if items.length > 0
     response = { collection: collection }
     [@success_code, @headers, response.to_json]
