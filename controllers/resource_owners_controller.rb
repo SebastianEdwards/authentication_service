@@ -25,7 +25,12 @@ module ResourceOwnersController
     def response(env)
       if resource_owner
         add_link 'self', '/~'
-        generate_response([resource_owner])
+        add_item '/~' do |item|
+          item.add_data 'uid', resource_owner.id
+          item.add_data 'name', resource_owner.name
+          item.add_data 'company_id', resource_owner.company_id
+        end
+        generate_response
       else
         message = "Invalid or expired access_token."
         raise Goliath::Validation::Error.new(400, message)
