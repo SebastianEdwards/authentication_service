@@ -54,11 +54,11 @@ module ProvidersController
       client.validate_url!(params[:redirect_uri])
       provider = Provider[params[:provider]]
       provider_uid = provider.uid(env)
-      unless user = User.find_by_provider_and_uid(provider.name, provider_uid)
-        user = User.create!({}, 400, "Error creating user.")
-        user.associate_with_provider!(provider.name, provider_uid)
+      unless resource_owner = ResourceOwner.find_by_provider_and_uid(provider.name, provider_uid)
+        resource_owner = ResourceOwner.create!({}, 400, "Error creating resource owner.")
+        resource_owner.associate_with_provider!(provider.name, provider_uid)
       end
-      code = Code.create!({user_id: user.id, client_id: client.id})
+      code = Code.create!({resource_owner_id: resource_owner.id, client_id: client.id})
       query = Rack::Utils.build_query({code: code.id})
       redirect_url = params[:redirect_uri] + '?' + query
       [302, {'Location' => redirect_url}]
