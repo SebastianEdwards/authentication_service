@@ -8,7 +8,9 @@ module ResourceOwnersController
 
   module Authenticatable
     def access_token
-      @access_token ||= AccessToken.find(env['HTTP_AUTHENTICATION'].match(/Bearer\s+(\w+)/i)[1])
+      if env['HTTP_AUTHENTICATION']
+        @access_token ||= AccessToken.find(env['HTTP_AUTHENTICATION'].match(/Bearer\s+(\w+)/i)[1])
+      end
     end
 
     def allowed_resource?(resource)
