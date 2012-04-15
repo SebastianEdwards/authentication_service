@@ -3,6 +3,7 @@ module ResourceOwnersController
     base.get '/~', Show
     base.put '/~', Update
     base.post '/~', Create
+    base.get '/resource_owner/:resource_owner_id/:resource', ResourceShow
   end
 
   module Authenticatable
@@ -10,11 +11,32 @@ module ResourceOwnersController
       @access_token ||= AccessToken.find(env['HTTP_AUTHENTICATION'].match(/Bearer\s+(\w+)/i)[1])
     end
 
+    def allowed_resource?(resource)
+      access_token.scope.include?("manage_#{resource}") ||
+      access_token.scope.include?("read_#{resource}")
+    end
+
     def resource_owner
       if access_token
-        resource_owner_id = access_token.resource_owner_id!
+        token_resource_owner_id = access_token.resource_owner_id!
+        if params[:resource_owner_id] == '~'
+          resource_owner_id = token_resource_owner_id
+        elsif params[:resource_owner_id] == token_resource_owner_id
+          resource_owner_id = params[:resource_owner_id]
+        else
+          message = "Token not authorized to access this resource owner."
+          raise Goliath::Validation::Error.new(400, message)
+        end
         @resource_owner ||= ResourceOwner.find!(resource_owner_id)
       end
+    end
+
+    def resource_owner!(status = 400, msg = "Invalid or expired access token.")
+      resource_owner or raise Goliath::Validation::Error.new(status, msg)
+    end
+
+    def allowed_resource!(resource, status = 400, msg = "Access token not allowed access to this resource.")
+      allowed_resource?(resource) or raise Goliath::Validation::Error.new(status, msg)
     end
   end
 
@@ -33,6 +55,25 @@ module ResourceOwnersController
       else
         message = "Invalid or expired access_token."
         raise Goliath::Validation::Error.new(400, message)
+      end
+    end
+  end
+
+  class ResourceShow < Goliath::API
+    include Authenticatable
+
+    def response(env)
+      headers = { 'Content-Type' => 'application/vnd.collection+json' }
+      if resource_owner! && allowed_resource!(params[:resource])
+        href = "/resource_owner/#{resource_owner.id}/#{params[:resource]}"
+        response = CollectionJSON.generate_for(href) do |builder|
+          builder.add_link "/resource_owner/#{resource_owner.id}", 'resource_owner'
+          resource_owner.resources[params[:resource]].each do |company_href|
+            builder.add_item company_href
+          end
+        end
+
+        [200, headers, response.to_json]
       end
     end
   end
