@@ -4,6 +4,7 @@ require 'em-synchrony'
 require "em-synchrony/em-http"
 require 'redis'
 require 'redis/connection/synchrony'
+require 'collection-json'
 require 'goliath'
 require 'uri'
 require 'logger'

@@ -4,15 +4,20 @@ module EndpointsController
   end
 
   class Show < Goliath::API
-    include HATEOAS
-
     def response(env)
-      add_header 'Cache-Control', 'max-age=3600, must-revalidate'
-      add_link 'resource_owner', '/~'
-      add_link 'oauth2_authorize', '/authorize'
-      add_link 'oauth2_token', '/token'
-      add_link 'providers', '/providers' if Provider.all.count >= 1
-      generate_response '/'
+      headers = {
+        'Content-Type' => 'application/vnd.collection+json',
+        'Cache-Control' => 'max-age=3600, must-revalidate'
+      }
+
+      response = CollectionJSON.generate_for('/') do |builder|
+        builder.add_link '/resource_owner/~', 'token_resource_owner'
+        builder.add_link '/authorize', 'oauth2_authorize'
+        builder.add_link '/token', 'oauth2_token'
+        builder.add_link '/providers', 'providers' if Provider.all.count >= 1
+      end
+
+      [200, headers, response.to_json]
     end
   end
 end

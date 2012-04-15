@@ -41,20 +41,25 @@ module ResourceOwnersController
   end
 
   class Show < Goliath::API
-    include HATEOAS
     include Authenticatable
 
     def response(env)
-      if resource_owner
-        add_item '/~' do |item|
-          item.add_data 'uid', resource_owner.id
-          item.add_data 'name', resource_owner.name
-          item.add_data 'company_id', resource_owner.company_id
+      if resource_owner!
+        headers = { 'Content-Type' => 'application/vnd.collection+json' }
+
+        response = CollectionJSON.generate_for("/resource_owner/#{resource_owner.id}") do |builder|
+          builder.add_item "/resource_owner/#{resource_owner.id}" do |item|
+            item.add_data 'uid', resource_owner.id.to_i
+            item.add_data 'name', resource_owner.name
+          end
+          resource_owner.resources.each do |resource_name, _|
+            if allowed_resource?(resource_name)
+              builder.add_link "/resource_owner/#{resource_owner.id}/#{resource_name}", resource_name
+            end
+          end
         end
-        generate_response '/~'
-      else
-        message = "Invalid or expired access_token."
-        raise Goliath::Validation::Error.new(400, message)
+        
+        [200, headers, response.to_json]
       end
     end
   end

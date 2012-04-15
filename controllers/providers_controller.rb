@@ -22,17 +22,22 @@ module ProvidersController
   end
 
   class Show < Goliath::API
-    include HATEOAS
-
     def response(env)
-      add_header 'Cache-Control', 'max-age=3600, must-revalidate'
-      Provider.all.each do |provider|
-        add_item provider.endpoint_url, do |item|
-          item.add_data('name', provider.name)
-          item.add_data('prompt', provider.prompt)
+      headers = {
+        'Content-Type' => 'application/vnd.collection+json',
+        'Cache-Control' => 'max-age=3600, must-revalidate'
+      }
+
+      response = CollectionJSON.generate_for('/providers') do |builder|
+        Provider.all.each do |provider|
+          builder.add_query provider.endpoint_url, provider.name, provider.prompt do |query|
+            query.add_data('client_id', '', 'Client ID')
+            query.add_data('redirect_uri', '', 'Post-auth Redirect URI')
+          end
         end
       end
-      generate_response '/providers'
+
+      [200, headers, response.to_json]
     end
   end
 
