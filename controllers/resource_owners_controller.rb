@@ -1,9 +1,9 @@
 module ResourceOwnersController
   def self.included(base)
-    base.get '/~', Show
-    base.put '/~', Update
-    base.post '/~', Create
+    base.get '/resource_owner/:resource_owner_id', Show
     base.get '/resource_owner/:resource_owner_id/:resource', ResourceShow
+    base.put '/resource_owner/:resource_owner_id', Update
+    base.post '/resource_owner', Create
   end
 
   module Authenticatable
