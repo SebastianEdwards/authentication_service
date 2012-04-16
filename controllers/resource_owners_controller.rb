@@ -78,6 +78,9 @@ module ResourceOwnersController
           resource_owner.resources[params[:resource]].each do |company_href|
             builder.add_item company_href
           end
+          builder.set_template do |template|
+            template.add_data 'href', '', 'Resource URI'
+          end
         end
 
         [200, headers, response.to_json]
