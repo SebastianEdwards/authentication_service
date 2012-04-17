@@ -11,10 +11,5 @@ gem "bcrypt-ruby"
 gem "rake"
 
 group :development, :test do
-  gem "sqlite3"
   gem "rspec"
-end
-
-group :production do
-  gem "pg"
 end
