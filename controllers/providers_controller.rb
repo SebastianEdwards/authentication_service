@@ -59,13 +59,19 @@ module ProvidersController
     def response(env)
       client = Client.find!(params[:client_id])
       client.validate_url!(params[:redirect_uri])
+      if params[:scope]
+        requested_scopes = params[:scope].split
+        granted_scope = client.authorize_scope(requested_scopes)
+      else
+        granted_scope = []
+      end
       provider = Provider[params[:provider]]
       provider_uid = provider.uid(env)
       unless resource_owner = ResourceOwner.find_by_provider_and_uid(provider.name, provider_uid)
         resource_owner = ResourceOwner.create!({}, 400, "Error creating resource owner.")
         resource_owner.associate_with_provider!(provider.name, provider_uid)
       end
-      code = Code.create!({resource_owner_id: resource_owner.id, client_id: client.id})
+      code = Code.create!({resource_owner_id: resource_owner.id, client_id: client.id, scope: granted_scope})
       query = Rack::Utils.build_query({code: code.id})
       redirect_url = params[:redirect_uri] + '?' + query
       [302, {'Location' => redirect_url}]
