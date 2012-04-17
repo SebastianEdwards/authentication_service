@@ -125,10 +125,7 @@ module ResourceOwnersController
 
     def response(env)
       if client = Client.find(params[:client_id])
-        unless client.valid_url(params[:redirect_uri])
-          message = "Invalid redirect_uri for given client."
-          raise Goliath::Validation::Error.new(400, message)
-        end
+        client.validate_url(params[:redirect_uri])
         resource_owner = ResourceOwner.new(resource_owner_params)
         resource_owner.save
         code = Code.new({resource_owner_id: resource_owner.id, client_id: client.id})
