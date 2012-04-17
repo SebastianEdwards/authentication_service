@@ -3,6 +3,7 @@ module ResourceOwnersController
     base.get '/resource_owner/:resource_owner_id', Show
     base.get '/resource_owner/:resource_owner_id/:resource', ResourceShow
     base.put '/resource_owner/:resource_owner_id', Update
+    base.get '/resource_owner', Index
     base.post '/resource_owner', Create
   end
 
@@ -106,6 +107,26 @@ module ResourceOwnersController
     def response(env)
       resource_owner.update_attributes! params
       [200, {'Content-Type' => 'application/JSON'}, update_tokens]
+    end
+  end
+
+  class Index < Goliath::API
+    def response(env)
+      headers = {
+        'Content-Type' => 'application/vnd.collection+json',
+        'Cache-Control' => 'max-age=3600, must-revalidate'
+      }
+
+      response = CollectionJSON.generate_for('/resource_owner') do |builder|
+        builder.set_template do |template|
+          template.add_data 'username', '', 'Email'
+          template.add_data 'password', '', 'Password'
+          template.add_data 'client_id', '', 'Client ID'
+          template.add_data 'redirect_uri', '', 'Redirect URI'
+        end
+      end
+
+      [200, headers, response.to_json]
     end
   end
 
