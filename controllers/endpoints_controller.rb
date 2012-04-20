@@ -11,7 +11,7 @@ module EndpointsController
       }
 
       response = CollectionJSON.generate_for('/') do |builder|
-        builder.add_link '/resource_owner/~', 'token_resource_owner'
+        builder.add_link '/resource_owner', 'resource_owner'
         builder.add_link '/authorize', 'oauth2_authorize'
         builder.add_link '/token', 'oauth2_token'
         builder.add_link '/providers', 'providers' if Provider.all.count >= 1

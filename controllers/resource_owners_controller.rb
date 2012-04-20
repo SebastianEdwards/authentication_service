@@ -22,15 +22,7 @@ module ResourceOwnersController
     def resource_owner
       if access_token
         token_resource_owner_id = access_token.resource_owner_id!
-        if params[:resource_owner_id] == '~'
-          resource_owner_id = token_resource_owner_id
-        elsif params[:resource_owner_id] == token_resource_owner_id
-          resource_owner_id = params[:resource_owner_id]
-        else
-          message = "Token not authorized to access this resource owner."
-          raise Goliath::Validation::Error.new(400, message)
-        end
-        @resource_owner ||= ResourceOwner.find!(resource_owner_id)
+        @resource_owner ||= ResourceOwner.find!(token_resource_owner_id)
       end
     end
 
@@ -111,13 +103,17 @@ module ResourceOwnersController
   end
 
   class Index < Goliath::API
+    include Authenticatable
+
     def response(env)
       headers = {
         'Content-Type' => 'application/vnd.collection+json',
-        'Cache-Control' => 'max-age=3600, must-revalidate'
+        'Cache-Control' => 'max-age=3600, must-revalidate',
+        'Vary' => 'Authentication'
       }
 
       response = CollectionJSON.generate_for('/resource_owner') do |builder|
+        builder.add_item("/resource_owner/#{resource_owner.id}") if resource_owner
         builder.set_template do |template|
           template.add_data 'username', '', 'Email'
           template.add_data 'password', '', 'Password'
