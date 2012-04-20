@@ -30,9 +30,9 @@ module ProvidersController
 
       response = CollectionJSON.generate_for('/providers') do |builder|
         Provider.all.each do |provider|
-          builder.add_query provider.endpoint_url, provider.name, provider.prompt do |query|
-            query.add_data('client_id', '', 'Client ID')
-            query.add_data('redirect_uri', '', 'Post-auth Redirect URI')
+          builder.add_query provider.endpoint_url, provider.name, prompt: provider.prompt do |query|
+            query.add_data 'client_id', prompt: 'Client ID'
+            query.add_data 'redirect_uri', prompt: 'Post-auth Redirect URI'
           end
         end
       end
