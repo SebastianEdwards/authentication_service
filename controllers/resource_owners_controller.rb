@@ -40,7 +40,11 @@ module ResourceOwnersController
 
     def response(env)
       if resource_owner!
-        headers = { 'Content-Type' => 'application/vnd.collection+json' }
+        headers = {
+          'Content-Type' => 'application/vnd.collection+json',
+          'Cache-Control' => 'max-age=5, must-revalidate',
+          'Vary' => 'Authentication'
+        }
 
         response = CollectionJSON.generate_for("/resource_owner/#{resource_owner.id}") do |builder|
           builder.add_item "/resource_owner/#{resource_owner.id}" do |item|
