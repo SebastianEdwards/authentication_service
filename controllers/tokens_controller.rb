@@ -28,7 +28,7 @@ module TokensController
           scope: granted_scope,
           token_type: "bearer"
         }
-        [200, {'Content-Type' => 'application/JSON'}, response.to_json]
+        [200, {'Content-Type' => 'application/json'}, response.to_json]
       end
     end
 
@@ -43,7 +43,7 @@ module TokensController
           scope: granted_scope,
           token_type: "bearer"
         }
-        [200, {'Content-Type' => 'application/JSON'}, response.to_json]
+        [200, {'Content-Type' => 'application/json'}, response.to_json]
       end
     end
 
@@ -59,7 +59,7 @@ module TokensController
           scope: granted_scope,
           token_type: "bearer"
         }
-        [200, {'Content-Type' => 'application/JSON'}, response.to_json]
+        [200, {'Content-Type' => 'application/json'}, response.to_json]
       end
     end
 
@@ -71,7 +71,7 @@ module TokensController
           scope: granted_scope,
           token_type: "bearer"
         }
-      [200, {'Content-Type' => 'application/JSON'}, response.to_json]
+      [200, {'Content-Type' => 'application/json'}, response.to_json]
     end
 
     def response(env)
