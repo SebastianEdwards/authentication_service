@@ -48,8 +48,8 @@ module ResourceOwnersController
 
         response = CollectionJSON.generate_for("/resource_owner/#{resource_owner.id}") do |builder|
           builder.add_item "/resource_owner/#{resource_owner.id}" do |item|
-            item.add_data 'uid', resource_owner.id.to_i
-            item.add_data 'name', resource_owner.name
+            item.add_data 'uid', value: resource_owner.id.to_i
+            item.add_data 'name', value: resource_owner.name
           end
           resource_owner.resources.each do |resource_name, _|
             if allowed_resource?(resource_name)
@@ -76,7 +76,7 @@ module ResourceOwnersController
             builder.add_item company_href
           end
           builder.set_template do |template|
-            template.add_data 'href', '', 'Resource URI'
+            template.add_data 'href', prompt: 'Resource URI'
           end
         end
 
@@ -119,10 +119,10 @@ module ResourceOwnersController
       response = CollectionJSON.generate_for('/resource_owner') do |builder|
         builder.add_item("/resource_owner/#{resource_owner.id}") if resource_owner
         builder.set_template do |template|
-          template.add_data 'username', '', 'Email'
-          template.add_data 'password', '', 'Password'
-          template.add_data 'client_id', '', 'Client ID'
-          template.add_data 'redirect_uri', '', 'Redirect URI'
+          template.add_data 'username', prompt: 'Email'
+          template.add_data 'password', prompt: 'Password'
+          template.add_data 'client_id', prompt: 'Client ID'
+          template.add_data 'redirect_uri', prompt: 'Redirect URI'
         end
       end
 
