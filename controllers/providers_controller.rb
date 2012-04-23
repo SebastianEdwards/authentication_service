@@ -24,7 +24,7 @@ module ProvidersController
   class Show < Goliath::API
     def response(env)
       headers = {
-        'Content-Type' => 'application/vnd.collection+json',
+        'Content-Type' => 'application/vnd.collection+json;type=providers',
         'Cache-Control' => 'max-age=3600, must-revalidate'
       }
 
