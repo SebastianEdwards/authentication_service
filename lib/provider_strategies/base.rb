@@ -21,8 +21,9 @@ module ProviderStrategies
 
     def redirect_uri
       query = {
-        client_id: params[:client_id]
         redirect_uri: clean_redirect_uri(params[:redirect_uri]),
+        client_id: params[:client_id],
+        scope: params[:scope]
       }
       redirect_query = build_query(query)
       'http://' + env["HTTP_HOST"] + "/providers/#{params[:provider]}/callback?" + redirect_query

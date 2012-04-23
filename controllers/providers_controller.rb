@@ -33,6 +33,7 @@ module ProvidersController
           builder.add_query provider.endpoint_url, provider.name, prompt: provider.prompt do |query|
             query.add_data 'client_id', prompt: 'Client ID'
             query.add_data 'redirect_uri', prompt: 'Post-auth Redirect URI'
+            query.add_data 'scope', prompt: 'Scope to grant successful access token.'
           end
         end
       end
