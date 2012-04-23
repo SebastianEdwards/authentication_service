@@ -57,6 +57,17 @@ module ProvidersController
   class Callback < Goliath::API
     include CommonValidations
 
+    def redirect_uri(code_id)
+      query = Rack::Utils.build_query({code: code_id})
+      URI.parse(params[:redirect_uri]).tap do |uri|
+        if uri.query && uri.query != ''
+          uri.query += "&#{query}"
+        else
+          uri.query = query
+        end
+      end.to_s
+    end
+
     def response(env)
       client = Client.find!(params[:client_id])
       client.validate_url!(params[:redirect_uri])
@@ -73,9 +84,7 @@ module ProvidersController
         resource_owner.associate_with_provider!(provider.name, provider_uid)
       end
       code = Code.create!({resource_owner_id: resource_owner.id, client_id: client.id, scope: granted_scope})
-      query = Rack::Utils.build_query({code: code.id})
-      redirect_url = params[:redirect_uri] + '?' + query
-      [302, {'Location' => redirect_url}]
+      [302, {'Location' => redirect_uri(code.id)}]
     end
   end # Callback
 end # ProvidersController
