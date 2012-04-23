@@ -13,10 +13,16 @@ module ProviderStrategies
       Rack::Utils.build_query(hash)
     end
 
+    def clean_redirect_uri(redirect_uri)
+      URI.parse(redirect_uri).tap do |uri|
+        uri.query.gsub! /code=\w+/, '' if uri.query
+      end.to_s
+    end
+
     def redirect_uri
       query = {
-        redirect_uri: params[:redirect_uri],
         client_id: params[:client_id]
+        redirect_uri: clean_redirect_uri(params[:redirect_uri]),
       }
       redirect_query = build_query(query)
       'http://' + env["HTTP_HOST"] + "/providers/#{params[:provider]}/callback?" + redirect_query
