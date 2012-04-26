@@ -1,9 +1,34 @@
 module TokensController
   def self.included(base)
     base.post '/token', Create
+    base.get '/token', Index
   end
 
   GRANT_TYPES = %w{code refresh_token password client_credentials}
+
+  class Index < Goliath::API
+    def response(env)
+      headers = {
+        'Content-Type' => 'application/vnd.collection+json',
+        'Cache-Control' => 'max-age=3600, must-revalidate'
+      }
+
+      response = CollectionJSON.generate_for('/token') do |builder|
+        builder.set_template do |template|
+          template.add_data 'client_id', prompt: 'Client ID'
+          template.add_data 'client_secret', prompt: 'Client secret'
+          template.add_data 'grant_type', prompt: 'Token grant type'
+          template.add_data 'code', prompt: 'Code'
+          template.add_data 'username', prompt: 'Username'
+          template.add_data 'password', prompt: 'Password'
+          template.add_data 'refresh_token', prompt: 'Refresh token'
+          template.add_data 'scope', prompt: 'Scope'
+        end
+      end
+
+      [200, headers, response.to_json]
+    end
+  end
 
   class Create < Goliath::API
     %w{grant_type client_id client_secret}.each do |attribute|
