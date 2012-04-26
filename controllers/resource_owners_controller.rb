@@ -1,10 +1,10 @@
 module ResourceOwnersController
   def self.included(base)
-    base.get '/resource_owner/:resource_owner_id', Show
-    base.get '/resource_owner/:resource_owner_id/:resource', ResourceShow
-    base.put '/resource_owner/:resource_owner_id', Update
-    base.get '/resource_owner', Index
-    base.post '/resource_owner', Create
+    base.get '/resource_owners/:resource_owner_id', Show
+    base.get '/resource_owners/:resource_owner_id/:resource', ResourceShow
+    base.put '/resource_owners/:resource_owner_id', Update
+    base.get '/resource_owners', Index
+    base.post '/resource_owners', Create
   end
 
   module Authenticatable
@@ -46,14 +46,14 @@ module ResourceOwnersController
           'Vary' => 'Authentication'
         }
 
-        response = CollectionJSON.generate_for("/resource_owner/#{resource_owner.id}") do |builder|
-          builder.add_item "/resource_owner/#{resource_owner.id}" do |item|
+        response = CollectionJSON.generate_for("/resource_owners/#{resource_owner.id}") do |builder|
+          builder.add_item "/resource_owners/#{resource_owner.id}" do |item|
             item.add_data 'uid', value: resource_owner.id.to_i
             item.add_data 'name', value: resource_owner.name
           end
           resource_owner.resources.each do |resource_name, _|
             if allowed_resource?(resource_name)
-              builder.add_link "/resource_owner/#{resource_owner.id}/#{resource_name}", resource_name
+              builder.add_link "/resource_owners/#{resource_owner.id}/#{resource_name}", resource_name
             end
           end
         end
@@ -69,9 +69,10 @@ module ResourceOwnersController
     def response(env)
       headers = { 'Content-Type' => 'application/vnd.collection+json' }
       if resource_owner! && allowed_resource!(params[:resource])
-        href = "/resource_owner/#{resource_owner.id}/#{params[:resource]}"
+        href = "/resource_owners/#{resource_owner.id}/#{params[:resource]}"
         response = CollectionJSON.generate_for(href) do |builder|
-          builder.add_link "/resource_owner/#{resource_owner.id}", 'resource_owner'
+          builder.add_link "/resource_owners/#{resource_owner.id}", 'resource_owner'
+          builder.add_link resource_owner.resources[params[:resource]].first, 'first'
           resource_owner.resources[params[:resource]].each do |company_href|
             builder.add_item company_href
           end
@@ -116,8 +117,8 @@ module ResourceOwnersController
         'Vary' => 'Authentication'
       }
 
-      response = CollectionJSON.generate_for('/resource_owner') do |builder|
-        builder.add_item("/resource_owner/#{resource_owner.id}") if resource_owner
+      response = CollectionJSON.generate_for('/resource_owners') do |builder|
+        builder.add_link("/resource_owners/#{resource_owner.id}", "current") if resource_owner
         builder.set_template do |template|
           template.add_data 'username', prompt: 'Email'
           template.add_data 'password', prompt: 'Password'
