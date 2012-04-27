@@ -6,6 +6,7 @@ require 'redis'
 require 'redis/connection/synchrony'
 require 'collection-json'
 require 'goliath'
+require 'collection-json/goliath'
 require 'uri'
 require 'logger'
 
@@ -29,6 +30,7 @@ end
 
 class AuthenticationService < Goliath::API
   use Goliath::Rack::Params
+  use CollectionJSON::Goliath::Params
 
   include AuthorizationsController
   include EndpointsController
