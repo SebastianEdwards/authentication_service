@@ -50,7 +50,7 @@ module TokensController
           access_token: access_token.id,
           expires_in: AccessToken.expires_in,
           refresh_token: refresh_token.id,
-          scope: granted_scope,
+          scope: access_token.scope,
           token_type: "bearer"
         }
         [200, {'Content-Type' => 'application/json'}, response.to_json]
@@ -65,7 +65,7 @@ module TokensController
           access_token: access_token.id,
           expires_in: AccessToken.expires_in,
           refresh_token: refresh_token.id,
-          scope: granted_scope,
+          scope: refresh_token.scope,
           token_type: "bearer"
         }
         [200, {'Content-Type' => 'application/json'}, response.to_json]
