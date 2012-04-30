@@ -50,10 +50,10 @@ module ResourceOwnersController
           builder.add_item "/resource_owners/#{resource_owner.id}" do |item|
             item.add_data 'uid', value: resource_owner.id.to_i
             item.add_data 'name', value: resource_owner.name
-          end
-          resource_owner.resources.each do |resource_name, _|
-            if allowed_resource?(resource_name)
-              builder.add_link "/resource_owners/#{resource_owner.id}/#{resource_name}", resource_name
+            resource_owner.resources.each do |resource_name, _|
+              if allowed_resource?(resource_name)
+                item.add_link "/resource_owners/#{resource_owner.id}/#{resource_name}", resource_name
+              end
             end
           end
         end
