@@ -52,7 +52,7 @@ module ResourceOwnersController
             item.add_data 'name', value: resource_owner.name
             resource_owner.resources.each do |resource_name, _|
               if allowed_resource?(resource_name)
-                item.add_link "/resource_owners/#{resource_owner.id}/#{resource_name}", resource_name
+                item.add_link "/resource_owners/#{resource_owner.id}/#{resource_name}", 'resource', name: resource_name
               end
             end
           end
@@ -71,7 +71,7 @@ module ResourceOwnersController
       if resource_owner! && allowed_resource!(params[:resource])
         href = "/resource_owners/#{resource_owner.id}/#{params[:resource]}"
         response = CollectionJSON.generate_for(href) do |builder|
-          builder.add_link "/resource_owners/#{resource_owner.id}", 'resource_owner'
+          builder.add_link "/resource_owners/#{resource_owner.id}", 'resource-owner'
           builder.add_link resource_owner.resources[params[:resource]].first, 'first'
           resource_owner.resources[params[:resource]].each do |company_href|
             builder.add_item company_href
